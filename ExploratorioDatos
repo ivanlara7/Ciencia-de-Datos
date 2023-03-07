@@ -1,0 +1,119 @@
+##Código análisis exploratorio de datos Viviendas
+
+###Importar librerías que usaremos en el análisis exploratorio de datos
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+from scipy.stats import norm
+from sklearn.preprocessing import StandardScaler
+from scipy import stats
+import warnings
+
+%matplotlib inline
+
+###Se declara la variable para poder leer el archivo train.csv
+df_train = pd.read_csv('train.csv')
+
+###Se muestran las primeras 20 columnas y filas para la visualización
+df_train.head(20) 
+
+###Nos sirve para conocer las dimensiones de la base de datos
+df_train.shape
+
+###Visualizar los primeros y últimos datos de una columna especifica
+df_train['Id']
+
+###Visualización dos columnas, primer y últimos cinco datos
+df_train[['Id','SalePrice']]
+
+###Cálculo de la media de la columna de SalePrice
+df_train['SalePrice'].mean()
+
+###La siguiente línea devuelve un resumen de las primeras columnas
+###Algunos de los datos que devuelve son media, desviación, etc.
+df_train.describe()
+
+###Para el describe de una sola columna
+df_train['SalePrice'].describe()
+
+###realizar la primera gráfica de frecuencias de SalePrice
+sns.displot(df_train['SalePrice'])
+
+###La gráfica que devuelve es de frecuencias, ahora hacemos simetría y curtosis
+df.train['SalePrice'].skew()
+df_train['SalePrice'].kurt
+
+##Creación de una gráfica scatter plot precio/venta con Area vivible
+### alojamos columna GrLivArea en una variable
+
+AreaLiv = 'GrLivArea'
+
+###Concaquenar dos columnas en una sola tabla, y la visualización
+SaleLivArea = pd.concat([df_train['SalePrice'],df_train[AreaLiv]], axis=1)
+SaleLivArea.head(20)
+
+###Ejecutamos la gráfica plot scatter, o de dispersión
+SaleLivArea.plot.scatter(x=AreaLiv, y='SalePrice', ylim=(0,800000));
+
+##Scatter plot para PrecioVenta y Area de Sotano
+SotArea = 'TotalBsmtSF'
+SaleSotArea = pd.concat([df_train['SalePrice'], df_train[SotArea]], axis = 1)
+SaleSotArea.head(20)
+SaleSotArea.plot.scatter(x=SotArea, y='SalePrice', ylim=(0,800000));
+
+##Relaciones categóricas
+### Vamos a ver la relación de precio de venta con calidad de la vivienda
+
+oaq= 'OverallQual'
+SaleOAQual = pd.concat([df_train['SalePrice'],df_train[oaq]], axis=1)
+SaleOAQual.head(5)
+
+##Ahora procedemos a hacer la gráfica de cajas SalePrice y Calidad
+###La siguiente lineal definimos el área del gráfico
+f, ax = plt.subplots(figsize=(8,6))  
+
+###creación de la gráfica boxplot, donde definimos en el eje de las "x" a var y en "y" a SalePrice y toda esta información esta almacenada en variable data
+fig = sns.boxplot(x=oaq, y="SalePrice", data=SaleOAQual)
+
+### definimos parametros en ejes, establecemos 0 como valor minimo y 800, 000 en valor máximo, todo para eje "y"
+fig.axis(ymin=0,ymax=800000)
+
+## Ahora gráfica de cajas con SalePrice y Año de Contrucción
+yb = 'YearBuilt'
+SaleYB = pd.contrar([df_train['SalePrice'],df_train[yb]], axis=1)
+SaleYB.head(5)
+f, ax = plt.subplots(figsize=(20,8))
+ig = sns.boxplot(x=var, y='SalePrice', data = SaleYB)
+fig.axis(ymin=0, ymax=800000)
+plt.xtricks(rotation=90)
+
+## Matriz de correlación
+### Declaramos variable de matriz de correlación
+corrmat = df_train.corr()
+corrmat
+
+f, ax = plt.subplots(figsize=(12,9))
+sns.heatmap(corrmat, vmax=.8, square=True)
+
+## Matriz de correlación con números
+
+### Las siguientes líneas arrojan las 10columnas con más correlación vs SalePrice
+k = 10
+cols = corrmat.nlargest(k, "SalePrice")["SalePrice"].index
+cols
+
+### Se imprimen los valores de correlción
+cm = np.corrcoef(df_train[cols].values.T)
+cm
+
+sns.set(font_scale=1.25)
+hm =sns.heatmap(cm, cbar=True, annot=True, square=True, fmt=".2f", annot_kws={"size":10,}, yticklabels=cols.values, xticklabels=cols.values)
+plt.show()
+
+## Scatter Plots entre Sale Price y variables correlaciondos
+sns.set()
+cols = [cols = ['SalePrice', 'OverallQual', 'GrLivArea', 'GarageCars', 'TotalBsmtSF', 'FullBath', 'YearBuilt']
+sns.pairplot(df_train[cols], height=2.5)
+plt.show()
